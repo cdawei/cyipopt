@@ -248,8 +248,8 @@ cdef class problem:
         if len(lb) != len(ub) or len(lb) != n:
             raise ValueError('lb and ub must either be None or have length n.')
 
-        cdef np.ndarray[DTYPEd_t, ndim=1]  np_lb = np.array(lb, dtype=DTYPEd).flatten()
-        cdef np.ndarray[DTYPEd_t, ndim=1]  np_ub = np.array(ub, dtype=DTYPEd).flatten()
+        cdef np.ndarray[DTYPEd_t, ndim=1]  np_lb = np.array(lb, dtype=DTYPEd, copy=False).ravel()
+        cdef np.ndarray[DTYPEd_t, ndim=1]  np_ub = np.array(ub, dtype=DTYPEd, copy=False).ravel()
 
         #
         # Handle the constraints
@@ -274,8 +274,8 @@ cdef class problem:
 
         self.__m = m
 
-        cdef np.ndarray[DTYPEd_t, ndim=1]  np_cl = np.array(cl, dtype=DTYPEd).flatten()
-        cdef np.ndarray[DTYPEd_t, ndim=1]  np_cu = np.array(cu, dtype=DTYPEd).flatten()
+        cdef np.ndarray[DTYPEd_t, ndim=1]  np_cl = np.array(cl, dtype=DTYPEd, copy=False).ravel()
+        cdef np.ndarray[DTYPEd_t, ndim=1]  np_cu = np.array(cu, dtype=DTYPEd, copy=False).ravel()
 
         #
         # Handle the callbacks
@@ -470,7 +470,7 @@ cdef class problem:
             if len(x_scaling) != self.__n:
                 raise ValueError('x_scaling must either be None or have length n.')
 
-            np_x_scaling = np.array(x_scaling, dtype=DTYPEd).flatten()
+            np_x_scaling = np.array(x_scaling, dtype=DTYPEd, copy=False).ravel()
             x_scaling_p = <Number*>np_x_scaling.data
 
 
@@ -480,7 +480,7 @@ cdef class problem:
             if len(g_scaling) != self.__m:
                 raise ValueError('g_scaling must either be None or have length n.')
 
-            np_g_scaling = np.array(g_scaling, dtype=DTYPEd).flatten()
+            np_g_scaling = np.array(g_scaling, dtype=DTYPEd, copy=False).ravel()
             g_scaling_p = <Number*>np_g_scaling.data
 
         ret_val = SetIpoptProblemScaling(
@@ -535,7 +535,7 @@ cdef class problem:
         if self.__n != len(x):
             raise ValueError('Wrong length of x0')
 
-        cdef np.ndarray[DTYPEd_t, ndim=1]  np_x = np.array(x, dtype=DTYPEd).flatten()
+        cdef np.ndarray[DTYPEd_t, ndim=1]  np_x = np.array(x, dtype=DTYPEd, copy=False).ravel()
 
         cdef ApplicationReturnStatus stat
         cdef np.ndarray[DTYPEd_t, ndim=1] g = np.zeros((self.__m,), dtype=DTYPEd)
@@ -546,14 +546,14 @@ cdef class problem:
 
         if lagrange == []:
             lagrange = np.zeros((self.__m,), dtype=DTYPEd)
-        cdef np.ndarray[DTYPEd_t, ndim=1] mult_g = np.array(lagrange, dtype=DTYPEd).flatten()
+        cdef np.ndarray[DTYPEd_t, ndim=1] mult_g = np.array(lagrange, dtype=DTYPEd, copy=False).ravel()
 
         if zl == []:
             zl = np.zeros((self.__n,), dtype=DTYPEd)
         if zu == []:
             zu = np.zeros((self.__n,), dtype=DTYPEd)
-        cdef np.ndarray[DTYPEd_t, ndim=1] mult_x_L = np.array(zl, dtype=DTYPEd).flatten()
-        cdef np.ndarray[DTYPEd_t, ndim=1] mult_x_U = np.array(zu, dtype=DTYPEd).flatten()
+        cdef np.ndarray[DTYPEd_t, ndim=1] mult_x_L = np.array(zl, dtype=DTYPEd, copy=False).ravel()
+        cdef np.ndarray[DTYPEd_t, ndim=1] mult_x_U = np.array(zu, dtype=DTYPEd, copy=False).ravel()
 
 
         cdef Number obj_val = 0
@@ -636,7 +636,7 @@ cdef Bool gradient_cb(
         self.__exception = sys.exc_info()
         return True
 
-    np_grad_f = np.array(ret_val, dtype=DTYPEd).flatten()
+    np_grad_f = np.array(ret_val, dtype=DTYPEd, copy=False).ravel()
 
     for i in range(n):
         grad_f[i] = np_grad_f[i]
@@ -673,7 +673,7 @@ cdef Bool constraints_cb(
         self.__exception = sys.exc_info()
         return True
 
-    np_g = np.array(ret_val, dtype=DTYPEd).flatten()
+    np_g = np.array(ret_val, dtype=DTYPEd, copy=False).ravel()
 
     for i in range(m):
         g[i] = np_g[i]
@@ -712,8 +712,8 @@ cdef Bool jacobian_cb(
             # Assuming a dense Jacobian
             #
             s = np.unravel_index(np.arange(self.__m*self.__n), (self.__m, self.__n))
-            np_iRow = np.array(s[0], dtype=DTYPEi)
-            np_jCol = np.array(s[1], dtype=DTYPEi)
+            np_iRow = np.array(s[0], dtype=DTYPEi, copy=False)
+            np_jCol = np.array(s[1], dtype=DTYPEi, copy=False)
         else:
             #
             # Sparse Jacobian
@@ -724,8 +724,8 @@ cdef Bool jacobian_cb(
                 self.__exception = sys.exc_info()
                 return True
 
-            np_iRow = np.array(ret_val[0], dtype=DTYPEi).flatten()
-            np_jCol = np.array(ret_val[1], dtype=DTYPEi).flatten()
+            np_iRow = np.array(ret_val[0], dtype=DTYPEi, copy=False).ravel()
+            np_jCol = np.array(ret_val[1], dtype=DTYPEi, copy=False).ravel()
 
         for i in range(nele_jac):
             iRow[i] = np_iRow[i]
@@ -746,7 +746,7 @@ cdef Bool jacobian_cb(
             self.__exception = sys.exc_info()
             return True
 
-        np_jac_g = np.array(ret_val, dtype=DTYPEd).flatten()
+        np_jac_g = np.array(ret_val, dtype=DTYPEd, copy=False).ravel()
 
         for i in range(nele_jac):
             values[i] = np_jac_g[i]
@@ -792,8 +792,8 @@ cdef Bool hessian_cb(
             # because they have the wrong stride
             #
             s = sps.coo_matrix(np.tril(np.ones((self.__n, self.__n))))
-            np_iRow = np.array(s.col, dtype=DTYPEi)
-            np_jCol = np.array(s.row, dtype=DTYPEi)
+            np_iRow = np.array(s.col, dtype=DTYPEi, copy=False)
+            np_jCol = np.array(s.row, dtype=DTYPEi, copy=False)
         else:
             #
             # Sparse Hessian
@@ -804,8 +804,8 @@ cdef Bool hessian_cb(
                 self.__exception = sys.exc_info()
                 return True
 
-            np_iRow = np.array(ret_val[0], dtype=DTYPEi).flatten()
-            np_jCol = np.array(ret_val[1], dtype=DTYPEi).flatten()
+            np_iRow = np.array(ret_val[0], dtype=DTYPEi, copy=False).ravel()
+            np_jCol = np.array(ret_val[1], dtype=DTYPEi, copy=False).ravel()
 
         for i in range(nele_hess):
             iRow[i] = np_iRow[i]
@@ -827,7 +827,7 @@ cdef Bool hessian_cb(
             self.__exception = sys.exc_info()
             return True
 
-        np_h = np.array(ret_val, dtype=DTYPEd).flatten()
+        np_h = np.array(ret_val, dtype=DTYPEd, copy=False).ravel()
 
         for i in range(nele_hess):
             values[i] = np_h[i]
