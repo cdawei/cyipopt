@@ -86,8 +86,8 @@ def pkgconfig(*packages, **kw):
 
 
 def main_unix():
-    IPOPT_INCLUDE_DIRS = 'coin_ipopt/include'
-    IPOPT_LIB_DIRS = 'coin_ipopt/lib'
+    IPOPT_INCLUDE_DIRS = os.path.expanduser('~/apps/miniconda3/include/coin')
+    IPOPT_LIB_DIRS = os.path.expanduser('~/apps/miniconda3/lib')
     IPOPT_LIBS = 'ipopt'
     CFLAGS = sysconfig._config_vars['CFLAGS']
     sysconfig._config_vars['CFLAGS'] = CFLAGS.replace(' -g ', ' ').replace(' -DNDEBUG ', ' ')
