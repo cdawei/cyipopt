@@ -16,6 +16,8 @@ License: EPL 1.0
 # Based on matlab code by Peter Carbonetto.
 #
 
+from __future__ import print_function, unicode_literals
+
 import numpy as np
 import scipy.sparse as sps
 import ipopt
@@ -115,7 +117,7 @@ class hs071(object):
         #
         # Example for the use of the intermediate callback.
         #
-        print "Objective value at iteration #%d is - %g" % (iter_count, obj_value)
+        print("Objective value at iteration #%d is - %g" % (iter_count, obj_value))
 
 
 def main():
@@ -144,8 +146,8 @@ def main():
     # Set solver options
     #
     #nlp.addOption('derivative_test', 'second-order')
-    nlp.addOption('mu_strategy', 'adaptive')
-    nlp.addOption('tol', 1e-7)
+    nlp.addOption(b'mu_strategy', b'adaptive')
+    nlp.addOption(b'tol', 1e-7)
 
     #
     # Scale the problem (Just for demonstration purposes)
@@ -154,18 +156,18 @@ def main():
         obj_scaling=2,
         x_scaling=[1, 1, 1, 1]
         )
-    nlp.addOption('nlp_scaling_method', 'user-scaling')
+    nlp.addOption(b'nlp_scaling_method', b'user-scaling')
 
     #
     # Solve the problem
     #
     x, info = nlp.solve(x0)
 
-    print "Solution of the primal variables: x=%s\n" % repr(x)
+    print("Solution of the primal variables: x=%s\n" % repr(x))
 
-    print "Solution of the dual variables: lambda=%s\n" % repr(info['mult_g'])
+    print("Solution of the dual variables: lambda=%s\n" % repr(info['mult_g']))
 
-    print "Objective=%s\n" % repr(info['obj_val'])
+    print("Objective=%s\n" % repr(info['obj_val']))
 
 
 if __name__ == '__main__':

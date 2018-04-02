@@ -44,12 +44,12 @@ class lasso(ipopt.problem):
         #
         # Set solver options
         #
-        self.addOption('derivative_test', 'second-order')
-        self.addOption('jac_d_constant', 'yes')
-        self.addOption('hessian_constant', 'yes')
-        self.addOption('mu_strategy', 'adaptive')
-        self.addOption('max_iter', 100)
-        self.addOption('tol', 1e-8)
+        self.addOption(b'derivative_test', b'second-order')
+        self.addOption(b'jac_d_constant', b'yes')
+        self.addOption(b'hessian_constant', b'yes')
+        self.addOption(b'mu_strategy', b'adaptive')
+        self.addOption(b'max_iter', 100)
+        self.addOption(b'tol', 1e-8)
      
     def solve(self, _lambda):
 
@@ -165,9 +165,9 @@ if __name__ == '__main__':
     for i, _lambda in enumerate(_lambdas):
         estim_betas[i, :] = problem.solve(_lambda)
         
-    plt.plot(_lambdas, estim_betas)
-    plt.xlabel('L1 Regularization Parameter')
-    plt.ylabel('Estimated Regression Coefficients')
-    plt.title('Lasso Solution as Function of The Regularization Parameter')
-    plt.show()
+    #plt.plot(_lambdas, estim_betas)
+    #plt.xlabel('L1 Regularization Parameter')
+    #plt.ylabel('Estimated Regression Coefficients')
+    #plt.title('Lasso Solution as Function of The Regularization Parameter')
+    # plt.show()
 
