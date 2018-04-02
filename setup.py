@@ -12,6 +12,7 @@ License: EPL 1.0
 import sys
 import os.path
 from distutils.sysconfig import get_python_lib
+from distutils import sysconfig
 import subprocess as sp
 
 from setuptools import setup
@@ -19,6 +20,7 @@ from setuptools.extension import Extension
 from Cython.Distutils import build_ext
 import Cython.Distutils
 import Cython.Compiler.Options
+from Cython.Build import cythonize
 import numpy as np
 import six
 
@@ -84,14 +86,26 @@ def pkgconfig(*packages, **kw):
 
 
 def main_unix():
+    IPOPT_INCLUDE_DIRS = 'coin_ipopt/include'
+    IPOPT_LIB_DIRS = 'coin_ipopt/lib'
+    IPOPT_LIBS = 'ipopt'
+    CFLAGS = sysconfig._config_vars['CFLAGS']
+    sysconfig._config_vars['CFLAGS'] = CFLAGS.replace(' -g ', ' ').replace(' -DNDEBUG ', ' ')
+    extra_flags = ['-march=haswell', '-v']
     setup(name=PACKAGE_NAME,
           version=VERSION,
           packages=[PACKAGE_NAME],
-          install_requires=DEPENDENCIES,
-          cmdclass={'build_ext': Cython.Distutils.build_ext},
+          #install_requires=DEPENDENCIES,
+          #cmdclass={'build_ext': Cython.Distutils.build_ext},
           include_package_data=True,
-          ext_modules=[Extension("cyipopt", ['src/cyipopt.pyx'],
-                                 **pkgconfig('ipopt'))])
+          ext_modules=cythonize([Extension(name='cyipopt', 
+                                 sources=['src/cyipopt.pyx'],
+                                 include_dirs=[IPOPT_INCLUDE_DIRS],
+                                 library_dirs=[IPOPT_LIB_DIRS],
+                                 libraries=[IPOPT_LIBS],
+                                 extra_compile_args=extra_flags,
+                                 language='c')]))
+#                                 **pkgconfig('ipopt'))])
 
 if __name__ == '__main__':
     if sys.platform == 'win32':
